@@ -1,0 +1,12 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: mindcheck-postgres
+    environment:
+      POSTGRES_DB: mindcheck
+      POSTGRES_USER: mindcheck
+      POSTGRES_PASSWORD: mindcheck
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
