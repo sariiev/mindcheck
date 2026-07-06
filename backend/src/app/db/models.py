@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime, timezone
 
-from sqlalchemy import String, Text, DateTime, ForeignKey, Float, Integer
+from sqlalchemy import String, Text, DateTime, ForeignKey, Float, Integer, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -40,7 +40,10 @@ class Answer(Base):
     question_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("questions.id"), nullable=False)
     text: Mapped[str] = mapped_column(Text, nullable=False)
     score: Mapped[float | None] = mapped_column(Float)
-    feedback: Mapped[Text] = mapped_column(Text)
+    summary: Mapped[str | None] = mapped_column(Text)
+    strengths: Mapped[list | None] = mapped_column(JSON)
+    issues: Mapped[list | None] = mapped_column(JSON)
+    suggestion: Mapped[str | None] = mapped_column(Text)
     answered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(tz=timezone.utc))
 
     question: Mapped["Question"] = relationship(back_populates="answers")
