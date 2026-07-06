@@ -1,7 +1,7 @@
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -11,8 +11,8 @@ from app.db.session import get_session
 router = APIRouter(prefix="/projects", tags=["projects"])
 
 class ProjectCreate(BaseModel):
-    name: str
-    description: str | None = None
+    name: str = Field(max_length=255)
+    description: str | None = Field(default=None, max_length=1000)
     strictness: int | None = None
 
 class ProjectResponse(BaseModel):
