@@ -13,17 +13,19 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 class ProjectCreate(BaseModel):
     name: str
     description: str | None = None
+    strictness: int | None = None
 
 class ProjectResponse(BaseModel):
     id: uuid.UUID
     name: str
     description: str| None = None
+    strictness: int | None = None
 
     model_config = {"from_attributes": True}
 
 @router.post("/", response_model=ProjectResponse)
 async def create_project(data: ProjectCreate, session: AsyncSession = Depends(get_session)):
-    project = Project(name=data.name, description=data.description)
+    project = Project(name=data.name, description=data.description, strictness=data.strictness)
     session.add(project)
     await session.commit()
     await session.refresh(project)
