@@ -1,5 +1,4 @@
 import uuid
-from tkinter.font import names
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -14,7 +13,7 @@ router = APIRouter(prefix="/projects", tags=["projects"])
 class ProjectCreate(BaseModel):
     name: str = Field(max_length=255)
     description: str | None = Field(default=None, max_length=1000)
-    strictness: int | None = None
+    strictness: int | None = Field(default=5, ge=1, le=10)
 
 class ProjectResponse(BaseModel):
     id: uuid.UUID

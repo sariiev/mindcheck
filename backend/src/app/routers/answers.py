@@ -13,7 +13,7 @@ router = APIRouter(prefix="/questions/{question_id}/answers", tags=["answers"])
 
 class AnswerCreate(BaseModel):
     text: str = Field(max_length=5000)
-    strictness: int | None = None
+    strictness: int | None = Field(default=5, ge=1, le=10)
 
 class AnswerResponse(BaseModel):
     id: uuid.UUID
