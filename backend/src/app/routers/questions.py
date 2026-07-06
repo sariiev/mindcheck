@@ -47,8 +47,8 @@ async def create_question(
     return question
 
 @router.get("/", response_model=list[QuestionResponse])
-async def get_questions(project_id: uuid.UUID, session: AsyncSession = Depends(get_session)):
-    questions = await session.execute(select(Question).where(Question.project_id == project_id))
+async def get_questions(session: AsyncSession = Depends(get_session)):
+    questions = await session.execute(select(Question))
     return questions.scalars().all()
 
 @router.get("/{question_id}", response_model=QuestionResponse)
