@@ -26,6 +26,7 @@ class AnswerResponse(BaseModel):
     issues: list[str]
     suggestion: str | None
     answered_at: datetime
+    strictness: int
 
     model_config = {"from_attributes": True}
 
@@ -55,7 +56,8 @@ async def submit_answer(
         summary=evaluation_result["summary"],
         strengths=evaluation_result["strengths"],
         issues=evaluation_result["issues"],
-        suggestion=evaluation_result["suggestion"]
+        suggestion=evaluation_result["suggestion"],
+        strictness=strictness
     )
     session.add(answer)
     await session.commit()

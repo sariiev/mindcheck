@@ -45,5 +45,6 @@ class Answer(Base):
     issues: Mapped[list | None] = mapped_column(JSON)
     suggestion: Mapped[str | None] = mapped_column(Text)
     answered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(tz=timezone.utc))
+    strictness: Mapped[int] = mapped_column(Integer)
 
     question: Mapped["Question"] = relationship(back_populates="answers")
