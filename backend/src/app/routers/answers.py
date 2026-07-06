@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -13,7 +14,7 @@ router = APIRouter(prefix="/questions/{question_id}/answers", tags=["answers"])
 
 class AnswerCreate(BaseModel):
     text: str = Field(max_length=5000)
-    strictness: int | None = Field(default=5, ge=1, le=10)
+    strictness: int | None = Field(default=None, ge=1, le=10)
 
 class AnswerResponse(BaseModel):
     id: uuid.UUID
@@ -24,6 +25,7 @@ class AnswerResponse(BaseModel):
     strengths: list[str]
     issues: list[str]
     suggestion: str | None
+    answered_at: datetime
 
     model_config = {"from_attributes": True}
 
