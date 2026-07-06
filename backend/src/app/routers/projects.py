@@ -1,4 +1,5 @@
 import uuid
+from tkinter.font import names
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -41,6 +42,22 @@ async def get_project(project_id: uuid.UUID, session: AsyncSession = Depends(get
     project = await session.get(Project, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+    return project
+
+@router.put("/{project_id}", response_model=ProjectResponse)
+async def update_project(
+        project_id: uuid.UUID,
+        data: ProjectCreate,
+        session: AsyncSession = Depends(get_session)
+):
+    project = await session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    project.name = data.name
+    project.description = data.description
+    project.strictness = data.strictness
+    await session.commit()
+    await session.refresh(project)
     return project
 
 @router.delete("/{project_id}")

@@ -57,6 +57,23 @@ async def get_question(
         raise HTTPException(status_code=404, detail="Question not found")
     return question
 
+@router.put("/{question_id}", response_model=QuestionResponse)
+async def update_question(
+        project_id: uuid.UUID,
+        question_id: uuid.UUID,
+        data: QuestionCreate,
+        session: AsyncSession = Depends(get_session)
+):
+    question = await session.get(Question, question_id)
+    if not question or question.project_id != project_id:
+        raise HTTPException(status_code=404, detail="Question not found")
+    question.text = data.text
+    question.reference_answer = data.reference_answer
+    question.topic = data.topic
+    await session.commit()
+    await session.refresh(question)
+    return question
+
 @router.delete("/{question_id}")
 async def delete_question(
         project_id: uuid.UUID,
