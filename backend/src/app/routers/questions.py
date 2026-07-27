@@ -5,13 +5,18 @@ from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.models import Question
+from app.db.models import Question, Project
 from app.db.session import get_session
 
 router = APIRouter(prefix="/questions", tags=["questions"])
 
 class QuestionCreate(BaseModel):
     project_id: uuid.UUID
+    text: str = Field(max_length=1000)
+    reference_answer: str | None = Field(default=None, max_length=3000)
+    topic: str | None = Field(default=None, max_length=255)
+
+class QuestionBulkCreateItem(BaseModel):
     text: str = Field(max_length=1000)
     reference_answer: str | None = Field(default=None, max_length=3000)
     topic: str | None = Field(default=None, max_length=255)
@@ -46,9 +51,41 @@ async def create_question(
     await session.refresh(question)
     return question
 
+@router.post("/bulk", response_model=list[QuestionResponse])
+async def bulk_create_questions(
+        project_id: uuid.UUID,
+        data: list[QuestionBulkCreateItem],
+        session: AsyncSession = Depends(get_session)
+):
+    project = await session.get(Project, project_id)
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+    questions = [
+        Question(
+            project_id=project_id,
+            text=question.text,
+            reference_answer=question.reference_answer,
+            topic=question.topic
+        )
+        for question in data
+    ]
+
+    session.add_all(questions)
+    await session.commit()
+    for question in questions:
+        await session.refresh(question)
+    return questions
+
 @router.get("/", response_model=list[QuestionResponse])
-async def get_questions(session: AsyncSession = Depends(get_session)):
-    questions = await session.execute(select(Question))
+async def get_questions(
+        project_id: uuid.UUID = None,
+        session: AsyncSession = Depends(get_session)
+):
+    query = select(Question)
+    if project_id is not None:
+        query = query.where(Question.project_id == project_id)
+
+    questions = await session.execute(query)
     return questions.scalars().all()
 
 @router.get("/{question_id}", response_model=QuestionResponse)

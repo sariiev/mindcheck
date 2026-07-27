@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Project
 from app.db.session import get_session
+from app.services.vector_store import delete_collection
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -64,6 +65,9 @@ async def delete_project(project_id: uuid.UUID, session: AsyncSession = Depends(
     project = await session.get(Project, project_id)
     if not project:
         raise HTTPException(status_code=404, detail="Project not found")
+
+    delete_collection(str(project_id))
+
     await session.delete(project)
     await session.commit()
     return {"ok": True}

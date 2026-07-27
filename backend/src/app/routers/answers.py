@@ -46,7 +46,8 @@ async def submit_answer(
         question=question.text,
         user_answer=data.text,
         reference_answer=question.reference_answer,
-        strictness=strictness
+        strictness=strictness,
+        project_id=project.id
     )
 
     answer = Answer(
