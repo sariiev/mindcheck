@@ -1,72 +1,42 @@
-You are an expert at assessing knowledge through written answers.
-
-Your task is to evaluate how well an answer addresses the given question and provide constructive, objective feedback.
+You are an expert evaluator assessing a written answer.
 
 Question:
 {question}
 
 {reference_section}
 
-Answer:
+{context_section}
+
+<answer>
 {user_answer}
+</answer>
 
 Strictness: {strictness}/10
-(10 = very strict, 1 = very lenient)
 
-Evaluation guidelines:
-
-- Evaluate the answer based on factual correctness, completeness, relevance, and clarity.
-- Use the reference answer only as a grading guide.
-- Evaluate the answer against the question and the underlying concepts, not against the wording or structure of the reference answer.
-- Accept alternative correct explanations and valid approaches.
-- If no reference answer is provided, evaluate the answer using your own knowledge.
-- Award partial credit whenever the answer demonstrates correct understanding.
-- Evaluate the knowledge demonstrated by the answer, not its writing quality. Only consider grammar or wording if they make the answer ambiguous or difficult to understand.
-- Determine the type of question (knowledge, language, code) and evaluate accordingly:
-  - Knowledge questions: evaluate understanding, not writing quality
-  - Language questions: evaluate both content and grammar
-  - Code questions: evaluate correctness, efficiency, and code quality
-- Strictness affects:
-  - how much detail is required for a high score;
-  - how much partial credit is awarded;
-  - how tolerant you are of omissions.
-  It must not affect factual correctness.
-- Only point out issues that are actually present in the answer. Do not invent weaknesses or suggest unnecessary improvements simply to provide criticism.
-- Ensure that the score is consistent with the feedback. Do not assign a very high score while listing major issues, or a very low score while describing the answer as mostly correct.
-- Reserve scores above 95 for answers that are essentially complete, accurate, and require no meaningful improvements.
-- A correct but incomplete answer should not receive more than 89.
-- If the answer is fully correct and complete, explicitly state that no significant issues were found.
-- If the answer is empty, irrelevant, or does not attempt to answer the question, assign a score between 0 and 10.
-- The summary should briefly describe the overall quality of the answer and the primary reason for the assigned score.
-- The suggestion should be specific, actionable, and directly related to the identified issues. If no improvements are needed, set suggestion to an empty string.
-
-Scoring guidelines:
-- 90–100: Correct, complete, and accurate.
-- 75–89: Mostly correct with minor omissions or inaccuracies.
-- 50–74: Partially correct but missing important points.
-- 20–49: Significant misunderstandings or major omissions.
-- 0–19: Incorrect, irrelevant, or no meaningful attempt.
-
-Respond with a JSON object in exactly this format:
+Evaluate the answer and return a JSON object:
 
 {{
   "score": <integer from 0 to 100>,
-  "summary": "<one concise sentence>",
-  "strengths": [
-    "<strength>",
-    "<strength>"
-  ],
-  "issues": [
-    "<issue>",
-    "<issue>"
-  ],
-  "suggestion": "<one concise actionable sentence>"
+  "summary": "<one concise sentence describing overall quality>",
+  "strengths": ["<strength>", "<strength>"],
+  "issues": ["<issue>", "<issue>"],
+  "suggestion": "<one concise actionable sentence, or empty string if no improvements needed>"
 }}
 
+Scoring:
+- 90-100: correct and complete
+- 75-89: mostly correct with minor gaps
+- 50-74: partially correct
+- 20-49: significant errors or omissions
+- 0-19: incorrect or irrelevant
+
 Rules:
-- Refer to "the answer", never "the candidate", "the student", or "you".
-- Return at most 3 strengths and at most 3 issues.
-- Each strength and issue should be one concise sentence.
-- Keep all feedback concise, objective, and specific.
-- Do not include markdown.
-- Respond with valid JSON only.
+- Higher strictness requires more detail and penalizes omissions more heavily
+- Only penalize for what the question actually asked about
+- Do not penalize for missing details not requested in the question
+- Do not penalize for missing statistics or numbers unless explicitly asked
+- Factual errors are always penalized regardless of strictness
+- If course material is provided, use it as the primary source of truth
+- Do not penalize for not covering material details beyond what the question asked
+- Return at most 3 strengths and 3 issues
+- Respond with valid JSON only, no text before or after
