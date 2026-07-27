@@ -19,6 +19,7 @@ class Project(Base):
     strictness: Mapped[int] = mapped_column(Integer, default=5)
 
     questions: Mapped[list["Question"]] = relationship(back_populates="project", cascade="all, delete-orphan")
+    materials: Mapped[list["Material"]] = relationship(back_populates="project", cascade="all, delete-orphan")
 
 class Question(Base):
     __tablename__ = "questions"
@@ -48,3 +49,13 @@ class Answer(Base):
     strictness: Mapped[int] = mapped_column(Integer)
 
     question: Mapped["Question"] = relationship(back_populates="answers")
+
+class Material(Base):
+    __tablename__ = "materials"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("projects.id"), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(tz=timezone.utc))
+
+    project: Mapped["Project"] = relationship(back_populates="materials")
