@@ -13,6 +13,16 @@ dependencies = [
     "asyncpg",
     "python-dotenv",
     "openai",
+    "python-multipart",
+    "pypdf",
+    "chromadb",
+    "sentence-transformers",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-asyncio",
 ]
 
 [tool.setuptools.packages.find]

@@ -10,3 +10,11 @@ services:
       - "5432:5432"
     volumes:
       - ./data/postgres:/var/lib/postgresql/data
+
+  chromadb:
+    image: chromadb/chroma:1.5.0
+    container_name: mindcheck-chromadb
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./data/chroma:/chroma/chroma

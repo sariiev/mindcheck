@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.init_db import init_db
-from app.routers import projects, questions, answers
+from app.routers import projects, questions, answers, materials
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,3 +27,4 @@ app.add_middleware(
 app.include_router(projects.router)
 app.include_router(questions.router)
 app.include_router(answers.router)
+app.include_router(materials.router)
