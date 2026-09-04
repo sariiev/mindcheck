@@ -13,9 +13,56 @@ Question:
 
 Strictness: {strictness}/10
 
-Evaluate the answer and return a JSON object:
+## Step 1 — Define required_points (mandatory, will be part of output)
+List the specific points the answer must address to fully answer the question.
+Follow these rules strictly when building this list:
+
+- If the question names specific sub-topics (e.g. "explain X, including A and B"),
+  required_points = exactly those named sub-topics. Nothing more.
+- If the question is open-ended (e.g. "what is the difference between X and Y",
+  "compare A and B", "explain X") AND reference material is provided: derive
+  required_points ONLY from the top-level organizing points of the reference
+  (e.g. its main headings or main bullets) — not from every fact, example, or
+  property mentioned inside the reference. Cap this list at 5 points maximum,
+  choosing the ones most central to answering the question.
+- If the question is open-ended AND no reference material is provided: do NOT
+  invent required_points from general/textbook knowledge of the topic. Instead
+  derive required_points only from what is minimally necessary to distinguish
+  X and Y at a conceptual level (e.g. for "difference between X and Y", that
+  minimally means: what X is for, what Y is for, and one key structural
+  difference — nothing more unless the question says more).
+- A generic comparison phrasing ("difference between", "compare") is NEVER by
+  itself a license to require textbook-standard dimensions (ACID, examples,
+  performance benchmarks, etc.) unless the question or reference explicitly
+  frames them as central to this comparison.
+
+Example (do not deviate from this pattern):
+Question: "What is the difference between OLTP and OLAP?"
+Reference: a paragraph covering purpose, schema design, and consistency tradeoffs.
+Correct required_points: ["purpose of OLTP vs OLAP", "schema design (normalized vs denormalized)", "consistency/redundancy tradeoff"]
+Incorrect required_points: adding "ACID properties", "query types", "data freshness",
+"specific product examples" — these are NOT in the reference's top-level structure
+and were not asked for, so they must not appear even though they are commonly
+discussed alongside this topic.
+
+## Step 2 — Check the answer against required_points only
+For each item in required_points, judge whether the answer addresses it
+(and correctly, if reference/context is available to verify facts). Do not
+introduce any new required item at this stage.
+
+## Step 3 — Apply strictness
+Strictness controls how thoroughly each required_point must be covered, not
+how many points exist.
+- Low (1-3): a correct high-level mention of each required_point is enough.
+- Medium (4-7): required_points need reasonably clear explanation.
+- High (8-10): required_points need precise, well-explained coverage — the
+  list itself from Step 1 never grows because of strictness.
+
+## Step 4 — Score and output
+Return a JSON object:
 
 {{
+  "required_points": ["<point>", "<point>"],
   "score": <integer from 0 to 100>,
   "summary": "<one concise sentence describing overall quality>",
   "strengths": ["<strength>", "<strength>"],
@@ -23,20 +70,20 @@ Evaluate the answer and return a JSON object:
   "suggestion": "<one concise actionable sentence, or empty string if no improvements needed>"
 }}
 
+Hard constraint: every entry in "issues" must correspond to a failure to
+adequately cover one specific item in "required_points". Before finalizing
+your answer, check each issue against required_points — if you cannot point
+to which required_point it violates, delete it from "issues".
+
 Scoring:
-- 90-100: correct and complete
-- 75-89: mostly correct with minor gaps
-- 50-74: partially correct
-- 20-49: significant errors or omissions
+- 90-100: correct and complete relative to required_points
+- 75-89: mostly correct with minor gaps in required_points
+- 50-74: partially correct relative to required_points
+- 20-49: significant errors or omissions in required_points
 - 0-19: incorrect or irrelevant
 
 Rules:
-- Higher strictness requires more detail and penalizes omissions more heavily
-- Only penalize for what the question actually asked about
-- Do not penalize for missing details not requested in the question
-- Do not penalize for missing statistics or numbers unless explicitly asked
-- Factual errors are always penalized regardless of strictness
-- If course material is provided, use it as the primary source of truth
-- Do not penalize for not covering material details beyond what the question asked
-- Return at most 3 strengths and 3 issues
-- Respond with valid JSON only, no text before or after
+- Do not penalize for missing statistics or numbers unless explicitly asked.
+- Factual errors in what the answer actually claims are always penalized regardless of strictness.
+- Return at most 3 strengths and 3 issues.
+- Respond with valid JSON only, no text before or after.
