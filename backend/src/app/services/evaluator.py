@@ -42,10 +42,7 @@ async def evaluate_answer(
         chunks = search_chunks(project_id, question)
         if chunks:
             context = "\n\n".join(chunks)
-            print(f"Found chunks: {context}")
-        else:
-            print("No chunks found")
-
+    
     context_section = (
         f"""
         Use the following course material as the primary source for evaluation. 
