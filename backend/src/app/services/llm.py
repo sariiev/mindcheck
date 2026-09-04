@@ -19,7 +19,7 @@ async def complete(prompt: str) -> str:
     response = await client.chat.completions.create(
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=MAX_TOKENS,
+        max_completion_tokens=MAX_TOKENS,
         temperature=TEMPERATURE
     )
     return response.choices[0].message.content.strip()
